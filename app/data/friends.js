@@ -1,8 +1,8 @@
 var friendArray = [
   {
     "name": "Brian",
-    "photo": "https://drive.google.com/file/d/0B_cPtuD8U1nkbHdGLXdVSHNkMkE/view?usp=sharing",
-    "Scores": "2,5,3,4,1,5,3,2,1,4"
+    "photo": "https://i.pinimg.com/736x/77/05/be/7705bea9f596b89bd3e4a5a087b6f66d--quokka-australian-animals.jpg",
+    "scores": "2,5,3,4,1,5,3,2,1,4"
   }
 ];
 

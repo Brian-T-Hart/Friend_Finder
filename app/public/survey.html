@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<title>Friend Finder</title>
   <meta charset="UTF-8">
-  <title>Friend Finder</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- <script src="https://code.jquery.com/jquery.js"></script> -->
 </head>
 <body>
 
@@ -37,7 +40,7 @@
 		<hr>
 
 		<h3><strong>Question 1</strong></h3>
-		<h4>Your mind is always buzzing with unexplored ideas and plans.</h4>
+		<h4>You consider yourself to be a creative person.</h4>
 	 	<select data-placeholder="" class="chosen-select" id="q1">
 	 		<option value=""></option>
             <option value="1">1 (Strongly Disagree)</option>
@@ -48,7 +51,7 @@
       	</select>
 
 		<h3><strong>Question 2</strong></h3>
-		<h4>Generally speaking, you rely more on your experience than your imagination.</h4>
+		<h4>Generally speaking, you make decisions based on emotions.</h4>
 	 	<select data-placeholder="" class="chosen-select" id="q2">
 	 		<option value=""></option>
             <option value="1">1 (Strongly Disagree)</option>
@@ -72,7 +75,7 @@
 
 
 		<h3><strong>Question 4</strong></h3>
-		<h4>You rarely do something just out of sheer curiosity.</h4>
+		<h4>You prefer to eat at familiar restaurants because you know what you like and don't want to be dissappointed if you try something new.</h4>
 	 	<select data-placeholder="" class="chosen-select" id="q4">
 	 		<option value=""></option>
             <option value="1">1 (Strongly Disagree)</option>
@@ -84,7 +87,7 @@
 
 
 		<h3><strong>Question 5</strong></h3>
-		<h4>People can rarely upset you.</h4>
+		<h4>Other people frustrate you easily.</h4>
 	 	<select data-placeholder="" class="chosen-select" id="q5">
 	 		<option value=""></option>
             <option value="1">1 (Strongly Disagree)</option>
@@ -119,7 +122,7 @@
       	</select>
 
 		<h3><strong>Question 8</strong></h3>
-		<h4>You rarely get carried away by fantasies and ideas.</h4>
+		<h4>Religious experience or faith is important to you.</h4>
 	 	<select data-placeholder="" class="chosen-select" id="q8">
 	 		<option value=""></option>
             <option value="1">1 (Strongly Disagree)</option>
@@ -155,10 +158,32 @@
 		<br>
 
 		<!-- Submit Button -->
-		<button type="submit" class="btn btn-primary btn-lg btn-block" id="submitButton"><i class="fa fa-check-circle" aria-hidden="true"></i>
+		<button type="submit" class="btn btn-primary btn-lg btn-block" id="submitButton"><i class="fa fa-check-circle" aria-hidden="true" data-toggle="modal" data-target="#myModal"></i>
  Submit</button>
 
 		<hr>
+
+    <!-- Modal -->
+   <div class="modal fade" id="myModal" role="dialog">
+     <div class="modal-dialog">
+
+       <!-- Modal content-->
+       <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal">&times;</button>
+           <h4 class="modal-title">Your Match</h4>
+         </div>
+         <div class="modal-body">
+           <div><h1 id="matchName"></h1></div>
+           <div id="matchImage"><img height="300" width="300" id="appendImage"/>
+           </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+         </div>
+       </div>
+
+     </div>
+   </div>
 
     <footer class="footer">
       <div class="container">
@@ -171,7 +196,19 @@
 <!-- <script src="friends.js"> -->
 <script type="text/javascript">
 
+  var scores = [];
+  var scoreArray = [];
+  var diffArray = [];
+  var matchPoints = [];
+
+  $(document).ready(function(){
+    $("#submitButton").click(function(){
+        $("#myModal").modal();
+    });
+  });
+
   $("#submitButton").click(function(){
+
     var name = $("#name").val().trim();
     var photo = $("#photo").val().trim();
     var q1 = $("#q1").val().trim();
@@ -185,7 +222,7 @@
     var q9 = $("#q9").val().trim();
     var q10 = $("#q10").val().trim();
 
-    var scores = [q1,q2,q3,q4,q5,q6,q7,q8,q9,q10];
+    scores = [q1,q2,q3,q4,q5,q6,q7,q8,q9,q10];
 
     localStorage.setItem("name", name);
     localStorage.setItem("photo", photo);
@@ -207,7 +244,43 @@
       console.log(JSON.stringify(data));
     }
   });
-});
+
+    $.ajax({
+      type: 'GET',
+      contentType: 'application/json',
+      url: '/api/friends'
+      }).done(function(response){
+        for (var i = 0; i < response.length; i++) {
+          scoreArray[i] = JSON.parse("[" + response[i].scores + "]");
+          var z = 0;
+            for (var j = 0; j < scores.length; j++) {
+                diffArray[j] = (Math.abs(parseInt(scores[j]) - (parseInt(scoreArray[i][j]))));
+                z = z + diffArray[j];
+            }
+          matchPoints[i] = z;
+          console.log("new user scores: " + scores);
+          console.log("scoreArray[" + i + "]:" + scoreArray[i]);
+          console.log("diffArray: " + diffArray);
+          console.log("matchPoints: " + matchPoints[i]);
+          console.log("-----------------------------------");
+        }
+        var matchScore = matchPoints[0];
+        var matchIndex = 0;
+          for (var k = 1; k < matchPoints.length - 1; k++) {
+              if (matchPoints[k] < matchScore) {
+                matchScore = matchPoints[k];
+                matchIndex = k;
+              }
+          }
+          console.log("The index of your match is " + matchIndex);
+          console.log("Your match is " + response[matchIndex].name);
+          console.log(response[matchIndex].photo);
+          var p = response[matchIndex].photo;
+          console.log(p);
+          $('#matchName').html(response[matchIndex].name);
+          $('#appendImage').attr('src', p );
+      });
+  });
 
 </script>
 </body>
