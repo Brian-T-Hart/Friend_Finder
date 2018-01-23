@@ -8,6 +8,11 @@ var friendArray = [
     "name": "Donald",
     "photo": "http://static4.businessinsider.com/image/56c640526e97c625048b822a-480/donald-trump.jpg",
     "scores": "1,5,2,4,3,5,4,4,2,1"
+  },
+  {
+    "name": "Hugh",
+    "photo": "http://ww1.hdnux.com/photos/67/35/42/14538916/13/920x920.jpg",
+    "scores": "5,2,4,3,5,4,4,2,1,3"
   }
 ];
 
